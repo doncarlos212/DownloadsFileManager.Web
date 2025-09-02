@@ -1,0 +1,2 @@
+usar libreria MUI 
+usar snackbar notifications para los errores
