@@ -9,7 +9,6 @@ import { createTheme, CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackBarProvider, useSnackBar } from './contexts/SnackBarContext';
 import EditRulePage from './pages/EditRulePage';
-import BreadcrumbsNav from './components/BreadcrumbsNav';
 
 function AppProviders() {
   const theme = createTheme();
@@ -35,7 +34,6 @@ function AppProviders() {
         <CssBaseline />
         <BrowserRouter>
           <Layout />
-          <BreadcrumbsNav />
           <Routes>
             <Route path={routes.home.path} element={<DashboardPage />} />
             <Route path={routes.rules.path} element={<RulesPage />} />

@@ -12,7 +12,6 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { routes } from './routes';
 import { Link as RouterLink } from 'react-router';
-import BreadcrumbsNav from './components/BreadcrumbsNav';
 
 function Layout() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
