@@ -2,8 +2,7 @@ import { routes } from "../routes";
 import api from "./apiClient";
 import { IRuleDto } from "./generated";
 
-export const getRules = async (): Promise<IRuleDto[]> => {
-    console.log("Fetching rules from API");
+export const getRules = async (): Promise<IRuleDto[]> => {    
     const {data} = await api.get<IRuleDto[]>(`${routes.rules.path}`);
     return data;
 }
@@ -23,4 +22,8 @@ export const updateRule = async (rule: IRuleDto): Promise<IRuleDto> => {
     return rule;
   }
   return res.data as IRuleDto;
+}
+
+export const deleteRule = async (id: string): Promise<void> => {
+    await api.delete(`${routes.rules.path}/${id}`);
 }

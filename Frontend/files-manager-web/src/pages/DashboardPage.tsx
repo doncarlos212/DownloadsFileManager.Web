@@ -1,9 +1,8 @@
-import { Grid, Card, CardContent, Typography, Button } from "@mui/material";
+import { Grid, Card, CardContent, Typography, Button, Chip, Stack, Tooltip, Divider } from "@mui/material";
 import {
     PieChart,
     Pie,
     Cell,
-    Tooltip,
     BarChart,
     Bar,
     XAxis,
@@ -12,6 +11,10 @@ import {
     Legend,
 } from "recharts";
 import AddRuleButton from "../components/AddRuleButton";
+import { useDashboard } from "../hooks/useDashboard";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { useNavigate } from "react-router";
+import { routes } from "../routes";
 
 // Mock data
 const stats = {
@@ -36,19 +39,40 @@ const actionsHistory = [
     { day: "Vie", actions: 3 },
 ];
 
-const latestRules = [
-    { name: "Regla 1", status: "Activa", priority: "Alta" },
-    { name: "Regla 2", status: "Inactiva", priority: "Baja" },
-    { name: "Regla 3", status: "Activa", priority: "Media" },
-];
-
 const latestActions = [
     { time: "10:30", action: "Mover archivo", result: "✅" },
     { time: "09:10", action: "Renombrar archivo", result: "❌" },
     { time: "08:45", action: "Eliminar archivo", result: "✅" },
 ];
 
+// Helpers de formato (simple, sin libs extra)
+function formatDate(iso?: string) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
+}
+
+function statusIsActive(status: any, enabledFallback?: boolean) {
+    if (typeof status === "boolean") return status;
+    if (typeof status === "number") return status === 1;
+    if (status == null && typeof enabledFallback === "boolean") return enabledFallback;
+    return String(status).toLowerCase() === "active";
+}
+
+const PRIORITY_COLOR: Record<string, "default" | "success" | "warning" | "error"> = {
+    low: "default",
+    medium: "warning",
+    high: "error",
+};
+
 export default function DashboardPage() {
+    const { data, isLoading, error } = useDashboard();
+    const navigate = useNavigate();
+
+    if (isLoading) return <Typography>Cargando...</Typography>;
+    if (error) return <Typography>Error al cargar datos</Typography>;
+
     return (
         <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12 }} p={3}>
             {/* Header */}
@@ -64,7 +88,7 @@ export default function DashboardPage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Total reglas</Typography>
-                        <Typography variant="h4">{stats.total}</Typography>
+                        <Typography variant="h4">{data?.ruleStats?.total}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -72,7 +96,7 @@ export default function DashboardPage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Reglas activas</Typography>
-                        <Typography variant="h4">{stats.active}</Typography>
+                        <Typography variant="h4">{data?.ruleStats?.active}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -80,7 +104,7 @@ export default function DashboardPage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Reglas inactivas</Typography>
-                        <Typography variant="h4">{stats.inactive}</Typography>
+                        <Typography variant="h4">{data?.ruleStats?.inactive}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -112,7 +136,7 @@ export default function DashboardPage() {
                                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip />
+
                         </PieChart>
                     </CardContent>
                 </Card>
@@ -125,7 +149,6 @@ export default function DashboardPage() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="day" />
                             <YAxis />
-                            <Tooltip />
                             <Legend />
                             <Bar dataKey="actions" fill="#82ca9d" />
                         </BarChart>
@@ -137,13 +160,46 @@ export default function DashboardPage() {
             <Grid size={{ xs: 4, md: 6 }}>
                 <Card>
                     <CardContent>
-                        <Typography variant="h6">Últimas reglas</Typography>
-                        {latestRules.map((rule, i) => (
-                            <Typography key={i}>
-                                {rule.name} - {rule.status} ({rule.priority})
-                            </Typography>
-                        ))}
-                        <Button size="small" sx={{ mt: 1 }}>Ver todas</Button>
+                        <Typography variant="h6" gutterBottom>Últimas reglas</Typography>
+                        {!data?.latestRules?.length && (
+                            <Typography variant="body2" color="text.secondary">Sin reglas recientes</Typography>
+                        )}
+                        <Stack divider={<Divider flexItem />} spacing={1}>
+                            {(data?.latestRules ?? []).slice(0, 5).map(r => {
+                                const active = statusIsActive((r as any).status, (r as any).enabled);
+                                const priority = ((r as any).priority ?? "").toString();
+                                const pKey = priority.toLowerCase();
+                                const chipColor = PRIORITY_COLOR[pKey] ?? "default";
+                                return (
+                                    <Stack key={r.id} direction="row" spacing={1} alignItems="center">
+                                        <Tooltip title={active ? "Activa" : "Inactiva"}>
+                                            <span>
+                                                {active ? (
+                                                    <CheckCircle fontSize="small" color="success" />
+                                                ) : (
+                                                    <Cancel fontSize="small" color="disabled" />
+                                                )}
+                                            </span>
+                                        </Tooltip>
+                                        <Typography variant="body2" sx={{ fontWeight: 600, flexGrow: 1, minWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                            {r.name}
+                                        </Typography>
+                                        {priority && (
+                                            <Chip
+                                                label={priority}
+                                                size="small"
+                                                color={chipColor}
+                                                variant={chipColor === "default" ? "outlined" : "filled"}
+                                            />
+                                        )}
+                                        <Typography variant="caption" color="text.secondary">
+                                            {formatDate((r as any).createdAtUtc)}
+                                        </Typography>
+                                    </Stack>
+                                );
+                            })}
+                        </Stack>
+                        <Button size="small" sx={{ mt: 1 }} onClick={() => navigate(routes.rules.path)}>Ver todas</Button>
                     </CardContent>
                 </Card>
             </Grid>
@@ -153,9 +209,9 @@ export default function DashboardPage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Últimas acciones</Typography>
-                        {latestActions.map((a, i) => (
-                            <Typography key={i}>
-                                [{a.time}] {a.action} {a.result}
+                        {(data?.latestActions ?? latestActions).slice(0, 6).map((a: any, i: number) => (
+                            <Typography key={i} variant="body2">
+                                [{formatDate(a.startedAtUtc) || a.time}] {a.actionType || a.action} - {a.ruleName || ""} {a.result === "Success" || a.result === "✅" ? "✅" : "❌"}
                             </Typography>
                         ))}
                         <Button size="small" sx={{ mt: 1 }}>Ver historial</Button>
@@ -165,7 +221,7 @@ export default function DashboardPage() {
 
             {/* Create Rule Button */}
             <Grid size={12} display="flex" justifyContent="center">
-                <AddRuleButton isError={false} />
+                <AddRuleButton disabled={false} />
             </Grid>
         </Grid>
     );

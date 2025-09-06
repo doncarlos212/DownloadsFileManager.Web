@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IRuleDto } from "../api/generated";
-import { addRule, getRule, getRules, updateRule } from "../api/rulesApi";
+import { addRule, deleteRule, getRule, getRules, updateRule } from "../api/rulesApi";
 import { useSnackBar } from "../contexts/SnackBarContext";
 
 
@@ -11,10 +11,15 @@ export function useRules() {
     });
 }
 
-export function useRule(id: string){
+export function useRule(id?: string){
   return useQuery<IRuleDto>({
     queryKey: ["rules", id],
-    queryFn: () => getRule(id),
+    queryFn: () => {
+      if (!id) {
+        return Promise.reject(new Error("No rule id provided"));
+      }
+      return getRule(id);
+    },
     enabled: !!id
   })
 }
@@ -45,6 +50,18 @@ export function useUpdateRule() {
       });
       queryClient.invalidateQueries({ queryKey: ["rules"], refetchType: "active" });
       snackBar.showSnackBar('Rule updated successfully', 'success');
+    }
+  });
+}
+
+export function useDeleteRule() {
+  const snackBar = useSnackBar();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteRule(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rules"] });
+      snackBar.showSnackBar('Rule deleted successfully', 'success');
     }
   });
 }

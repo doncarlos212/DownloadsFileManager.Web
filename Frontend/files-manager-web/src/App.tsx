@@ -8,7 +8,9 @@ import { ThemeProvider } from '@emotion/react';
 import { createTheme, CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackBarProvider, useSnackBar } from './contexts/SnackBarContext';
-import EditRulePage from './pages/EditRulePage';
+import RuleFormPage from './pages/RuleFormPage';
+import { SettingsPage } from './pages/SettingsPage';
+import LogsPage from './pages/LogsPage';
 
 function AppProviders() {
   const theme = createTheme();
@@ -26,8 +28,6 @@ function AppProviders() {
     },
   });
 
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
@@ -37,8 +37,10 @@ function AppProviders() {
           <Routes>
             <Route path={routes.home.path} element={<DashboardPage />} />
             <Route path={routes.rules.path} element={<RulesPage />} />
-            <Route path={routes.newRule.path} element={<div>NewRulePage</div>} />
-            <Route path={routes.editRule.path} element={<EditRulePage />} />
+            <Route path={routes.newRule.path} element={<RuleFormPage />} />
+            <Route path={routes.editRule.path} element={<RuleFormPage />} />
+            <Route path={routes.settings.path} element={<SettingsPage />} />
+            <Route path={routes.logs.path} element={<LogsPage />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

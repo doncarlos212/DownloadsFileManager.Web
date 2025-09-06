@@ -9,11 +9,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { routes } from './routes';
 import { Link as RouterLink } from 'react-router';
+import { ReactComponent as FMLogo } from './assets/FMLogo.svg';
+import { ReactComponent as FMLogoFilled } from './assets/FMLogoFilled.svg';
+import { useTheme } from '@mui/material/styles';
 
 function Layout() {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -27,7 +31,9 @@ function Layout() {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'inherit' }}>
+                        {isDark ? <FMLogoFilled width={28} height={28} /> : <FMLogo width={28} height={28} />}
+                    </Box>
                     <Typography
                         variant="h4"
                         noWrap
@@ -47,7 +53,7 @@ function Layout() {
                             },
                         }}
                     >
-                        LOGO
+                        FM
                     </Typography>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -88,7 +94,9 @@ function Layout() {
                             </MenuItem>
                         </Menu>
                     </Box>
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+                    <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, color: 'inherit' }}>
+                        <FMLogo width={24} height={24} />
+                    </Box>
                     <Typography
                         variant="h4"
                         noWrap

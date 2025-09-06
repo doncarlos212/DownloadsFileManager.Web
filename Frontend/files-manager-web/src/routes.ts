@@ -15,6 +15,7 @@ export const routes = {
     newRule: route("/rules/new"),
     editRule: route("/rules/:id/edit"),
     settings: route("/settings"),
-    logs: route("/logs")    
+    logs: route("/logs"),
+    dashboard: route("/dashboard"),
 }
 

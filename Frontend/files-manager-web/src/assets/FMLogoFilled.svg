@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-label="Files Manager Logo Filled">
+  <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z" fill="currentColor" opacity=".12"/>
+  <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square"/>
+  <path d="M6 9H18M6 15H18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+  <rect x="8.5" y="7.5" width="3" height="3" fill="currentColor"/>
+  <rect x="12.5" y="13.5" width="3" height="3" fill="currentColor"/>
+</svg>

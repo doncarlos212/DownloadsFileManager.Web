@@ -14,6 +14,19 @@ export interface ActionDto {
     target?: string | undefined;
 }
 
+export interface ActionExecutionDto {
+    startedAtUtc?: Date;
+    actionType?: string | undefined;
+    result?: ActionResult;
+    ruleName?: string | undefined;
+    message?: string | undefined;
+}
+
+export enum ActionResult {
+    Success = "Success",
+    Failed = "Failed",
+}
+
 export enum ActionTypeDto {
     Move = "Move",
     Copy = "Copy",
@@ -37,6 +50,19 @@ export enum ConflictPolicyDto {
     Error = "Error",
 }
 
+export interface DailyActionCountDto {
+    day?: Date;
+    actions?: number;
+}
+
+export interface DashboardDto {
+    ruleStats?: RuleStatsDto;
+    actionsHistory?: DailyActionCountDto[] | undefined;
+    latestRules?: RuleListItemDto[] | undefined;
+    latestActions?: ActionExecutionDto[] | undefined;
+    generatedAtUtc?: Date;
+}
+
 export enum LogLevel {
     Trace = "Trace",
     Debug = "Debug",
@@ -55,6 +81,23 @@ export interface RuleDto {
     priority?: number;
     conditions?: ConditionDto[] | undefined;
     actions?: ActionDto[] | undefined;
+    createdAtUtc?: Date;
+    updatedAtUtc?: Date;
+}
+
+export interface RuleListItemDto {
+    id?: string;
+    name?: string | undefined;
+    enabled?: boolean;
+    createdAtUtc?: Date;
+    updatedAtUtc?: Date;
+}
+
+export interface RuleStatsDto {
+    total?: number;
+    active?: number;
+    readonly inactive?: number;
+    actionsToday?: number;
 }
 
 export interface SettingDto {

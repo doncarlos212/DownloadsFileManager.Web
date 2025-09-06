@@ -10,14 +10,12 @@ interface RulesTableProps {
     isLoading: boolean;
     isError: boolean;
     error: any;
+    onEdit: (row: IRuleDto) => void;
+    onDelete: (row: IRuleDto) => void;
 }
 
-export default function RulesTable({ rules, isLoading, isError, error }: RulesTableProps) {
+export default function RulesTable({ rules, isLoading, isError, error, onEdit, onDelete }: RulesTableProps) {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
-    const handleEdit = (row: IRuleDto) => {
-        navigate(routes.editRule.to({ id: row.id! }));
-    };
 
     const columns: GridColDef[] = [
         { field: "name", headerName: "Name", flex: 1 },
@@ -51,7 +49,15 @@ export default function RulesTable({ rules, isLoading, isError, error }: RulesTa
             headerName: 'Edit',
             width: 100,
             renderCell: (params) => (
-                <Button onClick={() => handleEdit(params.row)}>Edit</Button>
+                <Button onClick={() => onEdit(params.row)}>Edit</Button>
+            )
+        },
+        {
+            field: 'delete',
+            headerName: 'Delete',
+            width: 100,
+            renderCell: (params) => (
+                <Button onClick={() => onDelete(params.row)}>Delete</Button>
             )
         }
     ];

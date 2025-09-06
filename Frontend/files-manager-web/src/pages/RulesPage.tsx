@@ -1,19 +1,55 @@
-import { Container, Stack, Typography } from "@mui/material";
+import { Box, Container, Stack, Typography } from "@mui/material";
 import AddRuleButton from "../components/AddRuleButton";
 import RulesTable from "../components/RulesTable";
-import { useRules } from "../hooks/useRules";
+import { useDeleteRule, useRules } from "../hooks/useRules";
+import { IRuleDto } from "../api/generated";
+import { routes } from "../routes";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+import ConfirmationDialog from "../components/DialogConfirmation";
 
 export default function RulesPage() {
+  const navigate = useNavigate();
   const { data: rules, isLoading, isError, error } = useRules();
+  const deleteMutation = useDeleteRule();
+  const [rowToDelete, setRowToDelete] = useState<IRuleDto | null>(null);
+
+  const onEdit = (row: IRuleDto) => {
+    navigate(routes.editRule.to({ id: row.id! }));
+  };
+
+  const onDelete = (row: IRuleDto) => {
+    setRowToDelete(row);
+  };
+
+  const closeConfirm = () => setRowToDelete(null);
+  const confirmDelete = () => {
+    if (!rowToDelete?.id) return;
+    deleteMutation.mutate(String(rowToDelete.id), {
+      onSettled: () => setRowToDelete(null),
+    });
+  };
+
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Typography variant="h4" gutterBottom>
         Rules Manager
       </Typography>
-      <Stack spacing={2}>
-        <AddRuleButton isError={isError} />
-        <RulesTable rules={rules} isLoading={isLoading} isError={isError} error={error} />
-      </Stack>
+      <Box sx={{ width: "100%" }}>
+        <Stack spacing={2}>
+          <AddRuleButton disabled={isError || isLoading} />
+          <RulesTable rules={rules} isLoading={isLoading} isError={isError} error={error} onEdit={onEdit} onDelete={onDelete} />
+          <ConfirmationDialog
+            open={!!rowToDelete}
+            title="Delete rule"
+            description={rowToDelete ? `Are you sure you want to delete "${rowToDelete.name}"?` : ""}
+            loading={deleteMutation.isPending}
+            confirmText="Delete"
+            onConfirm={confirmDelete}
+            onClose={closeConfirm}
+          />
+        </Stack>
+      </Box>
     </Container>
   );
 }

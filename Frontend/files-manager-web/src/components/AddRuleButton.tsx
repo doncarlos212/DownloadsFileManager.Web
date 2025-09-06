@@ -4,17 +4,15 @@ import { useNavigate } from "react-router";
 import { routes } from "../routes";
 
 interface AddRuleButtonProps {
-  isError: boolean;
+  disabled?: boolean;
 }
 
-export default function AddRuleButton({ isError }: AddRuleButtonProps) {
+export default function AddRuleButton({ disabled }: AddRuleButtonProps) {
   const navigate = useNavigate();
-
-  if (isError) { <></> }
 
   return (
     <div>
-      <Button variant="contained" onClick={() => navigate(routes.newRule.to())}>
+      <Button variant="contained" onClick={() => navigate(routes.newRule.to())} disabled={disabled}>
         Add Rule
       </Button>
     </div>
