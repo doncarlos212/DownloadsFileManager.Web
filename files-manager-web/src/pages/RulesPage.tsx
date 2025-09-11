@@ -7,12 +7,14 @@ import { routes } from "../routes";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import ConfirmationDialog from "../components/DialogConfirmation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function RulesPage() {
   const navigate = useNavigate();
-  const { data: rules, isLoading, isError, error } = useRules();
+  const { data: rules, isLoading, isError, error, refetch } = useRules();
   const deleteMutation = useDeleteRule();
   const [rowToDelete, setRowToDelete] = useState<IRuleDto | null>(null);
+  const qc = useQueryClient();
 
   const onEdit = (row: IRuleDto) => {
     navigate(routes.editRule.to({ id: row.id! }));
@@ -25,8 +27,14 @@ export default function RulesPage() {
   const closeConfirm = () => setRowToDelete(null);
   const confirmDelete = () => {
     if (!rowToDelete?.id) return;
-    deleteMutation.mutate(String(rowToDelete.id), {
-      onSettled: () => setRowToDelete(null),
+    deleteMutation.mutate(rowToDelete.id, {
+      onSuccess: () => {
+        qc.setQueryData<IRuleDto[]>(["rules"], (prev) =>
+          (prev ?? []).filter((r) => r.id !== rowToDelete.id)
+        );
+        setRowToDelete(null);
+        refetch();
+      },
     });
   };
 
@@ -38,11 +46,22 @@ export default function RulesPage() {
       <Box sx={{ width: "100%" }}>
         <Stack spacing={2}>
           <AddRuleButton disabled={isError || isLoading} />
-          <RulesTable rules={rules} isLoading={isLoading} isError={isError} error={error} onEdit={onEdit} onDelete={onDelete} />
+          <RulesTable
+            rules={rules}
+            isLoading={isLoading}
+            isError={isError}
+            error={error}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
           <ConfirmationDialog
             open={!!rowToDelete}
             title="Delete rule"
-            description={rowToDelete ? `Are you sure you want to delete "${rowToDelete.name}"?` : ""}
+            description={
+              rowToDelete
+                ? `Are you sure you want to delete "${rowToDelete.name}"?`
+                : ""
+            }
             loading={deleteMutation.isPending}
             confirmText="Delete"
             onConfirm={confirmDelete}

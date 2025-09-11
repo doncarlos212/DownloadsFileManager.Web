@@ -43,6 +43,7 @@ const emptyRule = (): IRuleDto => ({
 
 const CONDITION_TYPES = ["Extension", "NameContains", "MimeType", "Regex"];
 const ACTION_TYPES = ["Move", "Copy", "Delete", "Rename"];
+const MAX_ACTIONS = 1;
 
 // Extensiones comunes para el selector cuando el tipo es "Extension"
 const COMMON_EXTENSIONS = [
@@ -169,10 +170,23 @@ export default function RuleFormPage() {
 
     // Actions
     const addAction = () =>
-        setForm((prev) => ({
-            ...prev,
-            actions: [...(prev.actions ?? []), ({ type: ACTION_TYPES[0], target: "" } as ActionDto)],
-        }));
+        setForm(prev => {
+            if ((prev.actions?.length ?? 0) >= MAX_ACTIONS) return prev;
+            return {
+                ...prev,
+                actions: [...(prev.actions ?? []), ({ type: ACTION_TYPES[0], target: "" } as ActionDto)],
+            };
+        });
+
+    // Garantiza que nunca haya más de una acción (por si una regla antigua trae varias)
+    useEffect(() => {
+        setForm(prev => {
+            if ((prev.actions?.length ?? 0) > MAX_ACTIONS) {
+                return { ...prev, actions: prev.actions?.slice(0, MAX_ACTIONS) };
+            }
+            return prev;
+        });
+    }, []);
 
     const updateAction = (index: number, patch: Partial<ActionDto>) =>
         setForm((prev) => {
@@ -487,9 +501,21 @@ export default function RuleFormPage() {
                             </IconButton>
                         </Stack>
                     ))}
-                    <Button startIcon={<AddIcon />} onClick={addAction} variant="outlined" size="small" sx={{ alignSelf: "flex-start" }}>
-                        Add action
-                    </Button>
+                    {(form.actions?.length ?? 0) < MAX_ACTIONS ? (
+                        <Button
+                            startIcon={<AddIcon />}
+                            onClick={addAction}
+                            variant="outlined"
+                            size="small"
+                            sx={{ alignSelf: "flex-start" }}
+                        >
+                            Add action
+                        </Button>
+                    ) : (
+                        <Typography variant="caption" color="text.secondary">
+                            Solo se permite una acción por regla (Move / Copy / Delete / Rename).
+                        </Typography>
+                    )}
                 </Stack>
             </Paper>
         </Container>

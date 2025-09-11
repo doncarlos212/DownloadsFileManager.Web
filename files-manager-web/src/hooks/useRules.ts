@@ -58,7 +58,7 @@ export function useDeleteRule() {
   const snackBar = useSnackBar();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteRule(id),
+    mutationFn: deleteRule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       snackBar.showSnackBar('Rule deleted successfully', 'success');
