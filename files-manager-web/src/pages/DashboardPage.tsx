@@ -1,9 +1,8 @@
-import { Box, Card, CardContent, Typography, Stack, Chip, Divider, Tooltip, Button, Grid, Container, Paper } from "@mui/material";
+import { Box, Card, CardContent, Typography, Stack, Chip, Divider, Tooltip, Button, Grid, Container } from "@mui/material";
 import { CheckCircle, Cancel, FolderSpecial, FolderOff, TrendingUp } from "@mui/icons-material";
 import { useDashboard } from "../hooks/useDashboard";
 import { useNavigate } from "react-router";
 import { routes } from "../routes";
-import AddRuleButton from "../components/AddRuleButton";
 
 function statusIsActive(status: any, enabledFallback?: boolean) {
     if (typeof status === "boolean") return status;
