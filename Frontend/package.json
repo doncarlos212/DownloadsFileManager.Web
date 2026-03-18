@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@types/axios": "^0.9.36",
+    "axios": "^1.11.0"
+  },
+  "devDependencies": {
+    "nswag": "^14.5.0"
+  }
+}
