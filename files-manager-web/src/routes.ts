@@ -11,11 +11,12 @@ const route = (pattern: string) => {
 
 export const routes = {
     home: route("/"),
+    dashboard: route("/dashboard"),
     rules: route("/rules"),
     newRule: route("/rules/new"),
     editRule: route("/rules/:id/edit"),
     settings: route("/settings"),
     logs: route("/logs"),
-    dashboard: route("/dashboard"),
+    history: route("/history"),
 }
 

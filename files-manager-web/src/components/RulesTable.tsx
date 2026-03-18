@@ -62,6 +62,9 @@ const compactChipSx = {
 export default function RulesTable({ rules, isLoading, isError, error, onEdit, onDelete }: RulesTableProps) {
     const queryClient = useQueryClient();
 
+    // Filtrar reglas que no tengan id válido
+    const validRules = Array.isArray(rules) ? rules.filter(r => r.id != null && r.id !== "") : [];
+
     const columns: GridColDef[] = [
         { field: "name", headerName: "Name", flex: 1, minWidth: 140 },
         { field: "description", headerName: "Description", flex: 1.5, minWidth: 180 },
@@ -216,7 +219,7 @@ export default function RulesTable({ rules, isLoading, isError, error, onEdit, o
 
     return (
         <DataGrid
-            rows={rules ?? []}
+            rows={validRules}
             columns={columns}
             getRowId={(row: IRuleDto) => row.id as any}
             disableRowSelectionOnClick

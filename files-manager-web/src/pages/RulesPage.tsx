@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Container, Stack, Typography, Paper } from "@mui/material";
 import AddRuleButton from "../components/AddRuleButton";
 import RulesTable from "../components/RulesTable";
 import { useDeleteRule, useRules } from "../hooks/useRules";
@@ -39,13 +39,30 @@ export default function RulesPage() {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Typography variant="h4" gutterBottom>
-        Rules Manager
-      </Typography>
-      <Box sx={{ width: "100%" }}>
-        <Stack spacing={2}>
-          <AddRuleButton disabled={isError || isLoading} />
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          py: 4,
+        }}
+      >
+        <Container maxWidth="xl">
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Box>
+              <Typography variant="h3" fontWeight={700} gutterBottom>
+                Gestor de Reglas
+              </Typography>
+              <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                Administra las reglas de organización de archivos
+              </Typography>
+            </Box>
+            <AddRuleButton disabled={isError || isLoading} />
+          </Stack>
+        </Container>
+      </Box>
+      <Container maxWidth="xl" sx={{ pt: 3 }}>
+        <Paper sx={{ p: 3 }}>
           <RulesTable
             rules={rules}
             isLoading={isLoading}
@@ -67,8 +84,8 @@ export default function RulesPage() {
             onConfirm={confirmDelete}
             onClose={closeConfirm}
           />
-        </Stack>
-      </Box>
-    </Container>
+        </Paper>
+      </Container>
+    </Box>
   );
 }

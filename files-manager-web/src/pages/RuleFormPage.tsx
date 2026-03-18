@@ -265,259 +265,280 @@ export default function RuleFormPage() {
     }
 
     return (
-        <Container maxWidth="xl">
-            <Paper sx={{ p: 2, width: "100%", m: "16px auto" }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-                    <Typography variant="h6">{isNew ? "New rule" : "Edit rule"}</Typography>
-                    <Stack direction="row" spacing={1}>
-                        <Button color="inherit" onClick={onBack}>
-                            {isNew ? "Cancel" : "Back"}
-                        </Button>
-                        <Button
-                            variant="contained"
-                            disabled={!canSave}
-                            onClick={onSave}
-                        >
-                            {updateMutation.isPending || createMutation.isPending
-                                ? "Saving..."
-                                : (isNew ? "Create" : "Save")}
-                        </Button>
+        <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+            <Box
+                sx={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    py: 4,
+                }}
+            >
+                <Container maxWidth="xl">
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Box>
+                            <Typography variant="h3" fontWeight={700} gutterBottom>
+                                {isNew ? "Nueva Regla" : "Editar Regla"}
+                            </Typography>
+                            <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                                {isNew ? "Crea una nueva regla de organización" : "Modifica la regla existente"}
+                            </Typography>
+                        </Box>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="outlined"
+                                sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
+                                onClick={onBack}
+                            >
+                                {isNew ? "Cancelar" : "Volver"}
+                            </Button>
+                            <Button
+                                variant="contained"
+                                sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' } }}
+                                disabled={!canSave}
+                                onClick={onSave}
+                            >
+                                {updateMutation.isPending || createMutation.isPending
+                                    ? "Guardando..."
+                                    : (isNew ? "Crear Regla" : "Guardar Cambios")}
+                            </Button>
+                        </Stack>
                     </Stack>
-                </Stack>
+                </Container>
+            </Box>
+            <Container maxWidth="xl" sx={{ pt: 3 }}>
+                <Paper sx={{ p: 3, width: "100%" }}>
+                    <Stack spacing={3}>
+                        <TextField label="Name" value={form.name ?? ""} onChange={handleText("name")} autoFocus />
+                        <TextField
+                            label="Description"
+                            value={form.description ?? ""}
+                            onChange={handleText("description")}
+                            multiline
+                            minRows={2}
+                        />
+                        <TextField
+                            label="Priority"
+                            type="number"
+                            value={Number(form.priority ?? 0)}
+                            onChange={handleNumber("priority")}
+                            slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                        <FormControlLabel
+                            control={<Switch checked={Boolean(form.enabled)} onChange={handleBool("enabled")} />}
+                            label="Enabled"
+                        />
+                    </Stack>
 
-                <Divider sx={{ mb: 2 }} />
-
-                <Stack spacing={2}>
-                    <TextField label="Name" value={form.name ?? ""} onChange={handleText("name")} autoFocus />
-                    <TextField
-                        label="Description"
-                        value={form.description ?? ""}
-                        onChange={handleText("description")}
-                        multiline
-                        minRows={2}
-                    />
-                    <TextField
-                        label="Priority"
-                        type="number"
-                        value={Number(form.priority ?? 0)}
-                        onChange={handleNumber("priority")}
-                        slotProps={{ htmlInput: { min: 0 } }}
-                    />
-                    <FormControlLabel
-                        control={<Switch checked={Boolean(form.enabled)} onChange={handleBool("enabled")} />}
-                        label="Enabled"
-                    />
-                </Stack>
-
-                <Typography variant="subtitle1" sx={{ mt: 3 }}>
-                    Conditions
-                </Typography>
-                <Stack spacing={1} sx={{ mt: 1 }}>
-                    {(form.conditions ?? []).map((c, idx) => (
-                        <Stack key={idx} direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="flex-start">
-                            <FormControl sx={{ minWidth: 180 }}>
-                                <InputLabel id={`cond-type-${idx}`}>Type</InputLabel>
-                                <Select
-                                    labelId={`cond-type-${idx}`}
-                                    label="Type"
-                                    value={c?.type ?? ""}
-                                    onChange={(e) =>
-                                        updateCondition(idx, { type: e.target.value as any, value: "" })
-                                    }
-                                >
-                                    {CONDITION_TYPES.map((t) => (
-                                        <MenuItem key={t} value={t}>
-                                            {t}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            {c?.type === "Extension" ? (
-                                <FormControl sx={{ minWidth: 200, flex: 1 }}>
-                                    <InputLabel id={`cond-value-${idx}`}>Extension</InputLabel>
+                    <Typography variant="subtitle1" sx={{ mt: 3 }}>
+                        Conditions
+                    </Typography>
+                    <Stack spacing={1} sx={{ mt: 1 }}>
+                        {(form.conditions ?? []).map((c, idx) => (
+                            <Stack key={idx} direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="flex-start">
+                                <FormControl sx={{ minWidth: 180 }}>
+                                    <InputLabel id={`cond-type-${idx}`}>Type</InputLabel>
                                     <Select
-                                        labelId={`cond-value-${idx}`}
-                                        label="Extension"
-                                        value={c?.value ?? ""}
-                                        onChange={(e) => updateCondition(idx, { value: e.target.value as string })}
+                                        labelId={`cond-type-${idx}`}
+                                        label="Type"
+                                        value={c?.type ?? ""}
+                                        onChange={(e) =>
+                                            updateCondition(idx, { type: e.target.value as any, value: "" })
+                                        }
                                     >
-                                        {c?.value && !COMMON_EXTENSIONS.includes(c.value) && (
-                                            <MenuItem value={c.value}>{c.value}</MenuItem>
-                                        )}
-                                        {COMMON_EXTENSIONS.map((ext) => (
-                                            <MenuItem key={ext} value={ext}>
-                                                {ext}
+                                        {CONDITION_TYPES.map((t) => (
+                                            <MenuItem key={t} value={t}>
+                                                {t}
                                             </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
-                            ) : (
-                                <TextField
-                                    label="Value"
-                                    value={c?.value ?? ""}
-                                    onChange={(e) => updateCondition(idx, { value: e.target.value })}
-                                    fullWidth
-                                />
-                            )}
 
-                            <IconButton aria-label="remove condition" onClick={() => removeCondition(idx)}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Stack>
-                    ))}
-                    <Button startIcon={<AddIcon />} onClick={addCondition} variant="outlined" size="small" sx={{ alignSelf: "flex-start" }}>
-                        Add condition
-                    </Button>
-                </Stack>
+                                {c?.type === "Extension" ? (
+                                    <FormControl sx={{ minWidth: 200, flex: 1 }}>
+                                        <InputLabel id={`cond-value-${idx}`}>Extension</InputLabel>
+                                        <Select
+                                            labelId={`cond-value-${idx}`}
+                                            label="Extension"
+                                            value={c?.value ?? ""}
+                                            onChange={(e) => updateCondition(idx, { value: e.target.value as string })}
+                                        >
+                                            {c?.value && !COMMON_EXTENSIONS.includes(c.value) && (
+                                                <MenuItem value={c.value}>{c.value}</MenuItem>
+                                            )}
+                                            {COMMON_EXTENSIONS.map((ext) => (
+                                                <MenuItem key={ext} value={ext}>
+                                                    {ext}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                ) : (
+                                    <TextField
+                                        label="Value"
+                                        value={c?.value ?? ""}
+                                        onChange={(e) => updateCondition(idx, { value: e.target.value })}
+                                        fullWidth
+                                    />
+                                )}
 
-                <Typography variant="subtitle1" sx={{ mt: 3 }}>
-                    Actions
-                </Typography>
-                <Stack spacing={1} sx={{ mt: 1 }}>
-                    {(form.actions ?? []).map((a, idx) => (
-                        <Stack key={idx} direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="flex-start">
-                            <FormControl sx={{ minWidth: 180 }}>
-                                <InputLabel id={`act-type-${idx}`}>Type</InputLabel>
-                                <Select
-                                    labelId={`act-type-${idx}`}
-                                    label="Type"
-                                    value={a?.type ?? ""}
-                                    onChange={(e) => updateAction(idx, { type: e.target.value as any })}
-                                >
-                                    {ACTION_TYPES.map((t) => (
-                                        <MenuItem key={t} value={t}>
-                                            {t}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {(() => {
-                                const showValidation = requiresPath(a?.type);
-                                const relativeCapable = showValidation && !!baseWatchFolder;
-                                const relative = relativeCapable && isActionRelative(a?.target);
-                                const subfolder = relative ? getSubfolderFromTarget(a?.target) : "";
-                                const fullForValidation = relative ? joinBaseAndSub(subfolder) : (a?.target ?? "");
-                                const errorMsg = showValidation ? getWindowsPathError(fullForValidation) : null;
+                                <IconButton aria-label="remove condition" onClick={() => removeCondition(idx)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Stack>
+                        ))}
+                        <Button startIcon={<AddIcon />} onClick={addCondition} variant="outlined" size="small" sx={{ alignSelf: "flex-start" }}>
+                            Add condition
+                        </Button>
+                    </Stack>
 
-                                if (relative) {
+                    <Typography variant="subtitle1" sx={{ mt: 3 }}>
+                        Actions
+                    </Typography>
+                    <Stack spacing={1} sx={{ mt: 1 }}>
+                        {(form.actions ?? []).map((a, idx) => (
+                            <Stack key={idx} direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="flex-start">
+                                <FormControl sx={{ minWidth: 180 }}>
+                                    <InputLabel id={`act-type-${idx}`}>Type</InputLabel>
+                                    <Select
+                                        labelId={`act-type-${idx}`}
+                                        label="Type"
+                                        value={a?.type ?? ""}
+                                        onChange={(e) => updateAction(idx, { type: e.target.value as any })}
+                                    >
+                                        {ACTION_TYPES.map((t) => (
+                                            <MenuItem key={t} value={t}>
+                                                {t}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                {(() => {
+                                    const showValidation = requiresPath(a?.type);
+                                    const relativeCapable = showValidation && !!baseWatchFolder;
+                                    const relative = relativeCapable && isActionRelative(a?.target);
+                                    const subfolder = relative ? getSubfolderFromTarget(a?.target) : "";
+                                    const fullForValidation = relative ? joinBaseAndSub(subfolder) : (a?.target ?? "");
+                                    const errorMsg = showValidation ? getWindowsPathError(fullForValidation) : null;
+
+                                    if (relative) {
+                                        return (
+                                            <TextField
+                                                disabled={a?.type === ActionTypeDto.Delete}
+                                                label="Subfolder (relative)"
+                                                value={subfolder}
+                                                onChange={(e) => {
+                                                    const newFull = joinBaseAndSub(e.target.value);
+                                                    updateAction(idx, { target: newFull });
+                                                }}
+                                                error={!!errorMsg}
+                                                helperText={errorMsg ? errorMsg : `Full: ${fullForValidation}`}
+                                                slotProps={{
+                                                    formHelperText: { sx: { minHeight: 20, m: 0 } },
+                                                    input: {
+                                                        startAdornment: (
+                                                            <InputAdornment position="start" sx={{ fontSize: 11, maxWidth: 200, textOverflow: "ellipsis" }}>
+                                                                {baseWatchFolder}\
+                                                            </InputAdornment>
+                                                        ),
+                                                    },
+                                                }}
+                                                fullWidth
+                                            />
+                                        );
+                                    }
+
                                     return (
                                         <TextField
                                             disabled={a?.type === ActionTypeDto.Delete}
-                                            label="Subfolder (relative)"
-                                            value={subfolder}
-                                            onChange={(e) => {
-                                                const newFull = joinBaseAndSub(e.target.value);
-                                                updateAction(idx, { target: newFull });
-                                            }}
+                                            label={showValidation ? "Target path (Windows)" : "Target"}
+                                            value={a?.target ?? ""}
+                                            onChange={(e) => updateAction(idx, { target: e.target.value })}
                                             error={!!errorMsg}
-                                            helperText={errorMsg ? errorMsg : `Full: ${fullForValidation}`}
-                                            slotProps={{
-                                                formHelperText: { sx: { minHeight: 20, m: 0 } },
-                                                input: {
-                                                    startAdornment: (
-                                                        <InputAdornment position="start" sx={{ fontSize: 11, maxWidth: 200, textOverflow: "ellipsis" }}>
-                                                            {baseWatchFolder}\
-                                                        </InputAdornment>
-                                                    ),
-                                                },
-                                            }}
+                                            helperText={
+                                                errorMsg
+                                                    ? errorMsg
+                                                    : (relativeCapable
+                                                        ? "Pulsa el icono de cadena para usar WatchFolder como base"
+                                                        : " ")
+                                            }
+                                            slotProps={{ formHelperText: { sx: { minHeight: 20, m: 0 } } }}
                                             fullWidth
                                         />
                                     );
-                                }
-
-                                return (
-                                    <TextField
-                                        disabled={a?.type === ActionTypeDto.Delete}
-                                        label={showValidation ? "Target path (Windows)" : "Target"}
-                                        value={a?.target ?? ""}
-                                        onChange={(e) => updateAction(idx, { target: e.target.value })}
-                                        error={!!errorMsg}
-                                        helperText={
-                                            errorMsg
-                                                ? errorMsg
-                                                : (relativeCapable
-                                                    ? "Pulsa el icono de cadena para usar WatchFolder como base"
-                                                    : " ")
-                                        }
-                                        slotProps={{ formHelperText: { sx: { minHeight: 20, m: 0 } } }}
-                                        fullWidth
-                                    />
-                                );
-                            })()}
-                            {(() => {
-                                const showValidation = requiresPath(a?.type);
-                                const relativeCapable = showValidation && !!baseWatchFolder;
-                                if (!showValidation) {
+                                })()}
+                                {(() => {
+                                    const showValidation = requiresPath(a?.type);
+                                    const relativeCapable = showValidation && !!baseWatchFolder;
+                                    if (!showValidation) {
+                                        return (
+                                            <Tooltip title="Este tipo no requiere path">
+                                                <span>
+                                                    <IconButton size="small" disabled>
+                                                        <LinkOffIcon fontSize="small" />
+                                                    </IconButton>
+                                                </span>
+                                            </Tooltip>
+                                        );
+                                    }
+                                    if (!relativeCapable) {
+                                        return (
+                                            <Tooltip title="Configura WatchFolder en Settings para modo relativo">
+                                                <span>
+                                                    <IconButton size="small" disabled>
+                                                        <LinkOffIcon fontSize="small" />
+                                                    </IconButton>
+                                                </span>
+                                            </Tooltip>
+                                        );
+                                    }
+                                    const relative = isActionRelative(a?.target);
                                     return (
-                                        <Tooltip title="Este tipo no requiere path">
-                                            <span>
-                                                <IconButton size="small" disabled>
-                                                    <LinkOffIcon fontSize="small" />
-                                                </IconButton>
-                                            </span>
+                                        <Tooltip title={relative ? "Salir de modo relativo" : "Usar WatchFolder como base"}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    if (relative) {
+                                                        // salir: si era solo la base, limpia; si tenía subcarpeta deja el valor completo
+                                                        if (a?.target?.toLowerCase() === baseWatchFolderLower) {
+                                                            updateAction(idx, { target: "" });
+                                                        }
+                                                    } else {
+                                                        const current = a?.target ?? "";
+                                                        if (!current.toLowerCase().startsWith(baseWatchFolderLower + "\\")) {
+                                                            updateAction(idx, { target: baseWatchFolder });
+                                                        }
+                                                    }
+                                                }}
+                                                color={relative ? "primary" : "default"}
+                                            >
+                                                {relative ? <LinkIcon fontSize="small" /> : <LinkOffIcon fontSize="small" />}
+                                            </IconButton>
                                         </Tooltip>
                                     );
-                                }
-                                if (!relativeCapable) {
-                                    return (
-                                        <Tooltip title="Configura WatchFolder en Settings para modo relativo">
-                                            <span>
-                                                <IconButton size="small" disabled>
-                                                    <LinkOffIcon fontSize="small" />
-                                                </IconButton>
-                                            </span>
-                                        </Tooltip>
-                                    );
-                                }
-                                const relative = isActionRelative(a?.target);
-                                return (
-                                    <Tooltip title={relative ? "Salir de modo relativo" : "Usar WatchFolder como base"}>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                if (relative) {
-                                                    // salir: si era solo la base, limpia; si tenía subcarpeta deja el valor completo
-                                                    if (a?.target?.toLowerCase() === baseWatchFolderLower) {
-                                                        updateAction(idx, { target: "" });
-                                                    }
-                                                } else {
-                                                    const current = a?.target ?? "";
-                                                    if (!current.toLowerCase().startsWith(baseWatchFolderLower + "\\")) {
-                                                        updateAction(idx, { target: baseWatchFolder });
-                                                    }
-                                                }
-                                            }}
-                                            color={relative ? "primary" : "default"}
-                                        >
-                                            {relative ? <LinkIcon fontSize="small" /> : <LinkOffIcon fontSize="small" />}
-                                        </IconButton>
-                                    </Tooltip>
-                                );
-                            })()}
-                            <IconButton aria-label="remove action" onClick={() => removeAction(idx)}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Stack>
-                    ))}
-                    {(form.actions?.length ?? 0) < MAX_ACTIONS ? (
-                        <Button
-                            startIcon={<AddIcon />}
-                            onClick={addAction}
-                            variant="outlined"
-                            size="small"
-                            sx={{ alignSelf: "flex-start" }}
-                        >
-                            Add action
-                        </Button>
-                    ) : (
-                        <Typography variant="caption" color="text.secondary">
-                            Solo se permite una acción por regla (Move / Copy / Delete / Rename).
-                        </Typography>
-                    )}
-                </Stack>
-            </Paper>
-        </Container>
+                                })()}
+                                <IconButton aria-label="remove action" onClick={() => removeAction(idx)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Stack>
+                        ))}
+                        {(form.actions?.length ?? 0) < MAX_ACTIONS ? (
+                            <Button
+                                startIcon={<AddIcon />}
+                                onClick={addAction}
+                                variant="outlined"
+                                size="small"
+                                sx={{ alignSelf: "flex-start" }}
+                            >
+                                Add action
+                            </Button>
+                        ) : (
+                            <Typography variant="caption" color="text.secondary">
+                                Solo se permite una acción por regla (Move / Copy / Delete / Rename).
+                            </Typography>
+                        )}
+                    </Stack>
+                </Paper>
+            </Container>
+        </Box>
     );
 }
