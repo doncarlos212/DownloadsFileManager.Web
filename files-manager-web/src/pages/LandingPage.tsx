@@ -22,7 +22,7 @@ import {
 import { routes } from '../routes';
 import { Link as RouterLink } from 'react-router';
 
-const DOWNLOAD_URL = 'https://github.com/doncarlos212/DownloadsFileManager.Service/releases/latest/download/ProjectSetup.msi';
+const DOWNLOAD_URL = 'https://github.com/doncarlos212/DownloadsFileManager.Service/releases/latest/download/FilesManager-Setup-v1.0.0.exe';
 
 const LandingPage: React.FC = () => {
     return (
@@ -336,7 +336,7 @@ const LandingPage: React.FC = () => {
                                         Ejecuta el instalador
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Abre el archivo ProjectSetup.msi y sigue las instrucciones del asistente
+                                        Abre el archivo FilesManager-Setup-v1.0.0.exe y sigue las instrucciones del asistente
                                     </Typography>
                                 </Box>
                             </Box>
@@ -381,7 +381,7 @@ const LandingPage: React.FC = () => {
                                     fontSize: '1.1rem',
                                 }}
                             >
-                                Descargar ProjectSetup.msi
+                                Descargar FilesManager-Setup-v1.0.0.exe
                             </Button>
                         </Box>
                     </Paper>
